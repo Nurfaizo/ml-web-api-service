@@ -1,14 +1,14 @@
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const routes = require('./routes');
-const InputError = require('../errors/inputerrors'); // Import InputError class
+const InputError = require('../errors/inputerrors'); 
 
 const server = Hapi.server({
     port: 8000,
-    host: 'localhost',
+    host: process.env.HOST || '0.0.0.0', 
     routes: {
         cors: {
-            origin: ['*'],
+            origin: ['*'], 
         },
     },
 });

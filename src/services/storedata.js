@@ -1,12 +1,19 @@
-const { Firestore } = require('@google-cloud/firestore');
+
+const admin = require('firebase-admin');
 
 
-const db = new Firestore();
+admin.initializeApp({
+    credential: admin.credential.cert(require('../submissionmlgc-nurfaiz-firebase-adminsdk-vcht5-0716665f84.json')), 
+    databaseURL: 'https://submissionmlgc-nurfaiz.firebaseio.com' 
+});
+
+const db = admin.firestore();
+const collectionName = 'predictions'; 
 
 async function storeData(id, data) {
     try {
-        const predictCollection = db.collection('predictions');
-        await predictCollection.doc(id).set(data); 
+        const docRef = db.collection(collectionName).doc(id); 
+        await docRef.set(data); 
         return { id, ...data };
     } catch (error) {
         console.error('Error storing data in Firestore:', error);
@@ -17,18 +24,13 @@ async function storeData(id, data) {
 
 async function getAllData() {
     try {
-        const predictCollection = db.collection('predictions');
-        const snapshot = await predictCollection.get(); 
-        if (snapshot.empty) {
-            console.log('No predictions found.');
-            return []; 
-        }
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); 
+        const snapshot = await db.collection(collectionName).get(); 
+        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); 
+        return data;
     } catch (error) {
         console.error('Error fetching data from Firestore:', error);
         throw new Error('Failed to fetch data');
     }
 }
-
 
 module.exports = { storeData, getAllData };
